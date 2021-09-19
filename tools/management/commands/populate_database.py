@@ -22,39 +22,28 @@ class Command(BaseCommand):
             data = json.loads(rf.read())
         return data
     
+
     def _populate_cities(self, values:dict) -> None:
         """ populate city table """
 
-        obj, created = City.objects.get_or_create(
-            name=values.get("city"),
-            state=values.get("state"),
-            state_short=values.get("state_short"),
-            postal_code=values.get("postal_code"),
-        )
-
-        if created:
-            print(f"Created {obj.name}")
-
-
-    def _populate_countries(self, values:dict) -> None:
-        """ populate country table """
-
         try:
-            _city = City.objects.get(name=values.get("city"))
+            _country = Country.objects.get(name=values.get("country"))
 
-            obj, created = Country.objects.get_or_create(
-                name=values.get("country"),
-                code=values.get("coutry_code"),
-                timezone=values.get("timezone"),
-                city=_city,
+            obj, created = City.objects.get_or_create(
+                name=values.get("city"),
+                state=values.get("state"),
+                country=_country,
+                state_short=values.get("state_short"),
+                postal_code=values.get("postal_code"),
             )
+
             if created:
                 print(f"Created {obj.name}")
+            else:
+                pass
 
-        except (City.MultipleObjectsReturned, City.DoesNotExist) as exc:
+        except (Country.MultipleObjectsReturned, Country.DoesNotExist) as exc:
             print(exc)
-        
-        
 
 
 
@@ -63,7 +52,21 @@ class Command(BaseCommand):
         data = self._load_json_file(self.mock_path)
         
         for element in data:
+            try:
+                obj, created = Country.objects.get_or_create(
+                    name=element.get("country"),
+                    code=element.get("coutry_code"),
+                    timezone=element.get("timezone"),
+                )
+
+                if created:
+                    print(f"Created {obj.name}")
+
+            except Exception as EXC:
+                continue
+
+        for element in data:
             self._populate_cities(element)
-            self._populate_countries(element)
+
 
 

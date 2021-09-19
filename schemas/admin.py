@@ -9,8 +9,11 @@ class CountryAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "code",
-        "city",
         "timezone"
+    )
+
+    search_fields = (
+        "name",
     )
 
 
@@ -20,8 +23,13 @@ class CityAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "state",
+        "country",
         "state_short",
         "postal_code",
     )
 
+    search_fields = (
+        "name",
+        "country__name"
+    )
 
